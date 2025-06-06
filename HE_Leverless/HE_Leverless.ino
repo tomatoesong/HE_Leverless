@@ -10,7 +10,7 @@ uint8_t const desc_hid_report[] = {
   TUD_HID_REPORT_DESC_KEYBOARD()
 };
 
-Adafruit_USBD_HID usb_hid(NULL, 0, HID_ITF_PROTOCOL_NONE, 1, false);
+Adafruit_USBD_HID usb_hid(NULL, 0, HID_ITF_PROTOCOL_KEYBOARD, 1, false);
 
 // Array of pins and its keycode.
 uint8_t pins[] = { 17, 18, 38, 39 };
@@ -29,10 +29,11 @@ void setup() {
     TinyUSBDevice.begin(0);
   }
   // Setup HID
-  usb_hid.setBootProtocol(HID_ITF_PROTOCOL_KEYBOARD);
-  usb_hid.setPollInterval(2);
+  // usb_hid.setBootProtocol(HID_ITF_PROTOCOL_KEYBOARD);
+  // usb_hid.setPollInterval(1);
   usb_hid.setReportDescriptor(desc_hid_report, sizeof(desc_hid_report));
-  usb_hid.setStringDescriptor("HE_Leverless");
+  TinyUSBDevice.setProductDescriptor("HE_Leverless");
+  // usb_hid.setStringDescriptor("HE_Leverless");
 
   usb_hid.begin();
 
