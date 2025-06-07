@@ -1,9 +1,16 @@
 #include "Config.h"
-#include <Adafruit_TinyUSB.h>
 
 int aCal;
 int amin;
 int amax;
+
+TaskHandle_t Core0;
+TaskHandle_t Core1;
+bool syncFlag0 = false;
+bool syncFlag1 = false;
+uint16_t keys = 0;
+uint8_t keys0 = 0;
+uint8_t keys1 = 0;
 
 // Single Report (no ID) descriptor
 uint8_t const desc_hid_report[] = {
@@ -12,19 +19,34 @@ uint8_t const desc_hid_report[] = {
 
 Adafruit_USBD_HID usb_hid(NULL, 0, HID_ITF_PROTOCOL_KEYBOARD, 1, false);
 
-// Array of pins and its keycode.
-uint8_t pins[] = { 17, 18, 38, 39 };
-// number of pins
-uint8_t pincount = sizeof(pins) / sizeof(pins[0]);
-// For keycode definition check out https://github.com/hathach/tinyusb/blob/master/src/class/hid/hid.h
-uint8_t hidcode[] = { HID_KEY_0, HID_KEY_1, HID_KEY_2, HID_KEY_3 };
-bool activeState = false;
-
 void setup() {
-  Serial.begin(115200);
-  // aCal = analogRead(HE_PINS[0]);
-  // rangCalc(amax, amin);
+  // Serial.begin(115200);
+  // aCal = analogRead(pins[0]);
+  // rang_Calc(amax, amin);
 
+  /*
+  *  Multi-Core Setup
+  */
+  xTaskCreatePinnedToCore(
+    Core0_Task,
+    "Core0",
+    10000,
+    NULL,
+    1,
+    &Core0,
+    0);
+  xTaskCreatePinnedToCore(
+    Core1_Task,
+    "Core1",
+    10000,
+    NULL,
+    1,
+    &Core1,
+    1);
+
+  /*
+  *  USB Setup
+  */
   if (!TinyUSBDevice.isInitialized()) {
     TinyUSBDevice.begin(0);
   }
@@ -43,11 +65,10 @@ void setup() {
     delay(10);
     TinyUSBDevice.attach();
   }
-
   // Set up pin as input
-  for (uint8_t i = 0; i < pincount; i++) {
-    pinMode(pins[i], activeState ? INPUT_PULLDOWN : INPUT_PULLUP);
-  }
+  // for (uint8_t i = 0; i < pincount; i++) {
+  //   pinMode(pins[i], activeState ? INPUT_PULLDOWN : INPUT_PULLUP);
+  // }
 }
 
 void loop() {
@@ -77,7 +98,7 @@ void loop() {
   //   Serial.println(42);
   // }
 
-  // int a1 = analogRead(HE_PINS[0]);
+  // int a1 = analogRead(pins[0]);
   // Serial.printf("Max: %d, Min: %d, Range: %d, %d\n", amax, amin, amax - amin, a1);
 
 
@@ -86,17 +107,17 @@ void loop() {
   // Serial.printf("%d, %d, %d\n", aCal, a1, af1);
 
   // for(uint8_t i = 0; i < 13; i++){
-  //   output += analogRead(HE_PINS[i]);
+  //   output += analogRead(pins[i]);
   //   output += ", ";
   // }
   // Serial.println(output);
-  // interfaceSend(HE_PINS);
+  // interfaceSend(pins);
   // delay(500);
 
-    #ifdef TINYUSB_NEED_POLLING_TASK
+#ifdef TINYUSB_NEED_POLLING_TASK
   // Manual call tud_task since it isn't called by Core's background
   TinyUSBDevice.task();
-  #endif
+#endif
 
   // not enumerated()/mounted() yet: nothing to do
   if (!TinyUSBDevice.mounted()) {
@@ -111,12 +132,12 @@ void loop() {
   }
 }
 
-void rangCalc(int& max, int& min) {
+void rang_Calc(int& max, int& min) {
   max = 0;
   min = 4096;
 
   for (int i = 0; i < 1000; i++) {
-    int readVal = analogRead(HE_PINS[0]);
+    int readVal = analogRead(pins[0]);
     if (readVal > max) {
       max = readVal;
     }
@@ -131,11 +152,18 @@ void process_hid() {
   static bool keyPressedPreviously = false;
 
   uint8_t count = 0;
-  uint8_t keycode[6] = {0};
+  uint8_t keycode[6] = { 0 };
 
   // scan normal key and send report
   for (uint8_t i = 0; i < pincount; i++) {
-    if (activeState == digitalRead(pins[i])) {
+    // if (activeState == digitalRead(pins[i])) {
+    //   // if pin is active (low), add its hid code to key report
+    //   keycode[count++] = hidcode[i];
+
+    //   // 6 is max keycode per report
+    //   if (count == 6) break;
+    // }
+    if (analogRead(pins[i]) < 1400) {
       // if pin is active (low), add its hid code to key report
       keycode[count++] = hidcode[i];
 
@@ -169,4 +197,30 @@ void process_hid() {
       usb_hid.keyboardRelease(0);
     }
   }
+}
+
+void read_HE() {
+}
+
+void Core0_Task(void* pvParameters) {
+  for (uint8_t i = 0; i < 7; i++) {
+    keys0 += analogRead(pins[i]) << i;
+  }
+  syncFlag0 = true;
+  while (!(syncFlag0 & syncFlag1)) {
+    // Idle while waiting for the other core
+  }
+  syncFlag0 = false;
+  keys = ((keys1 << 8) | keys0);
+}
+
+void Core1_Task(void* pvParameters) {
+  for (uint8_t i = 0; i < 6; i++) {
+    keys1 += analogRead(pins[7 + i]) << i;
+  }
+  syncFlag1 = true;
+  while (!(syncFlag0 & syncFlag1)) {
+    // Idle while waiting for the other core
+  }
+  syncFlag1 = false;
 }
