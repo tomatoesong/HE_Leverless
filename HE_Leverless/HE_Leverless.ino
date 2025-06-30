@@ -22,8 +22,8 @@ void setup() {
   //  USB Setup begin
   init_hid();
 
-  fillArrayWith(rT_Triggers, 100, pincount);  //REMOVE THIS LATER!!!
-  fillArrayWith(rT_ResetDistances, 100, pincount);  //REMOVE THIS LATER!!!
+  fillArrayWith(rT_Triggers, DEFAULT_TRIGGER, pincount);  //REMOVE THIS LATER!!!
+  fillArrayWith(rT_ResetDistances, DEFAULT_RESET, pincount);  //REMOVE THIS LATER!!!
   fillArrayWith(lastPos, 1900, pincount); //REMOVE THIS LATER!!!
 }
 
