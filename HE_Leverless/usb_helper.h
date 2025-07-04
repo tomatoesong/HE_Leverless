@@ -19,7 +19,15 @@ extern uint16_t* triggerUp;
 
 extern uint16_t keys;
 
-void process_hid();
+enum Controller_Mode {
+  GAMEPAD,
+  KEYBOARD
+};
+
+extern Controller_Mode controller_mode;
+
+void keyboard_process_hid();
+void gamepad_process_hid();
 void init_hid();
 void timerStart();
 unsigned long timerStop();
