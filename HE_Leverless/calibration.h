@@ -1,7 +1,6 @@
 #ifndef CALIBRATION_H_
 #define CALIBRATION_H_
 
-#define RGB_BUILTIN 21
 #define RGB_BRIGHTNESS 10
 
 #define ADC_BYTE_SIZE 2

@@ -2,6 +2,7 @@
 #include "esp32-hal.h"
 #include "esp32-hal-rgb-led.h"
 #include <Arduino.h>
+#include "config.h"
 #include "calibration.h"
 #include "usb_helper.h"
 

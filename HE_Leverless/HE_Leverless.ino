@@ -2,8 +2,10 @@
 #include "usb_helper.h"
 #include "calibration.h"
 #include "trigger_mode.h"
+#include "access_point.h"
 
 bool calibrationMode = false;
+bool accessPointMode = false;
 Mode mode = RAPID_FIRE_MODE;
 
 void setup() {
@@ -15,6 +17,10 @@ void setup() {
   }
   if (digitalRead(pbpins[0]) == activeState) {
     calibrationMode = true;
+  }
+  if (digitalRead(pbpins[5]) == activeState) {
+    accessPointMode = true;
+    accessPointInit();
   }
   //  EEPROM Setup begin
   EEPROM.begin(ADC_BYTE_SIZE * (pincount * 4 + 10));  // triggerDown and triggerUp plus 10 extra
@@ -28,6 +34,11 @@ void setup() {
 }
 
 void loop() {
+  if (accessPointMode) {
+    while (1) {
+      wifiProtocol();
+    }
+  }
   if (!calibrationMode) {
     switch (mode) {
       case RAPID_FIRE_MODE:
