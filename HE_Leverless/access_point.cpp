@@ -17,21 +17,207 @@ const char* base64Encoding = "c29uZ3RvbTk2Ojk2MDEwNQ==";  // base64encoding user
 
 const char html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>ESP32 AP Button</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rapid Trigger Settings</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #f0f0f0;
+      font-family: sans-serif;
+      gap: 3vh;
+    }
+
+    .grey-box {
+    	position: relative;
+  		width: 80vw;             /* Responsive width */
+  		height: 50vh;            /* Responsive height */
+
+  		min-width: 700px;        /* Minimum width */
+  		max-width: 1000px;        /* Maximum width */
+
+  		min-height: 550px;       /* Minimum height */
+  		max-height: 1000px;       /* Maximum height */
+
+  		background: #ccc;
+  		border-radius: 2vw;
+  		box-shadow: 0 0.5vw 1vw rgba(0, 0, 0, 0.2);
+    }
+
+    .circle-button {
+      position: absolute;
+      width: 7.5vw;
+      min-width: 70px;
+      max-width: 90px;
+      height: 7.5vw;
+      min-height: 70px;
+      max-height: 90px;
+      border-radius: 50%;
+      border: none;
+      background: #fff;
+      border: 0.3vw solid #999;
+      font-size: clamp(14px, 2vw, 20px);
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .circle-button:hover {
+      background: #ddd;
+      transform: scale(1.05);
+    }
+    
+    .circle-button.active {
+  	background-color: red;
+  	color: white;
+	}
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 10vw);
+      gap: 2vw;
+      justify-content: center;
+    }
+
+    .buttons button {
+      padding: 2vh 0;
+      font-size: clamp(14px, 1.5vw, 20px);
+      border: none;
+      border-radius: 1vw;
+      background: #555;
+      color: white;
+      cursor: pointer;
+    }
+
+    .buttons button:hover {
+      background: #333;
+    }
+    
+    .input-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5vh;
+      margin-top: 3vh;
+    }
+
+    .input-with-button {
+      display: flex;
+      gap: 1vw;
+      align-items: center;
+    }
+
+    .input-with-button input {
+      padding: 1vh 1vw;
+      font-size: clamp(14px, 2vw, 20px);
+      border: 1px solid #ccc;
+      border-radius: 0.6vw;
+      width: 30vw;
+    }
+
+    .input-with-button button {
+      padding: 1vh 2vw;
+      font-size: clamp(14px, 1.2vw, 20px);
+      border: none;
+      border-radius: 0.6vw;
+      background-color: #555;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .input-with-button button:hover {
+      background-color: #333;
+    }
+
+
+    
+  </style>
 </head>
 <body>
-  <h2>ESP32 Access Point with Static IP</h2>
-  <button onclick="buttonClicked()">Click Me</button>
+  <div class="grey-box">
+    <!-- Responsive positioning using % -->
+    <button onclick="buttonClicked(1)" class="circle-button" style="top: 22%; left: 12%;">1</button>
+    <button onclick="buttonClicked(2)" class="circle-button" style="top: 20%; left: 23%;">2</button>
+    <button onclick="buttonClicked(3)" class="circle-button" style="top: 26%; left: 33%;">3</button>
+    
+    <button onclick="buttonClicked(4)" class="circle-button" style="top: 60%; left: 37%;">4</button>
+    <button onclick="buttonClicked(5)" class="circle-button" style="top: 60%; left: 53%;">5</button>
 
+    <button onclick="buttonClicked(6)" class="circle-button" style="top: 30%; left: 49%;">6</button>
+    
+    <button onclick="buttonClicked(7)" class="circle-button" style="top: 38%; left: 59%;">7</button>
+    <button onclick="buttonClicked(8)" class="circle-button" style="top: 33%; left: 69%;">8</button>
+    <button onclick="buttonClicked(9)" class="circle-button" style="top: 35%; left: 79%;">9</button>
+    
+    <button onclick="buttonClicked(10)" class="circle-button" style="top: 21%; left: 59%;">10</button>
+    <button onclick="buttonClicked(11)" class="circle-button" style="top: 16%; left: 69%;">11</button>
+    <button onclick="buttonClicked(12)" class="circle-button" style="top: 18%; left: 79%;">12</button>
+
+
+    <button onclick="buttonClicked(13)" class="circle-button" style="top: 27%; left: 88%;">13</button>
+  </div>
+
+  <div class="buttons">
+    <button>Calibrate</button>
+    <button>Button 2</button>
+  </div>
+  
+  <div class="input-area">
+    <div class="input-with-button">
+    <label>Trigger Distance:</label>
+    <input id="input1" type="text" value="0" placeholder="First input..." />
+    <button onclick="submit(1)">Submit 1</button>
+  	</div>
+
+  	<div class="input-with-button">
+    <label>Reset Distance:</label>
+    <input id="input2" type="text" value="0" placeholder="Second input..." />
+    <button onclick="submit(2)">Submit 2</button>
+  	</div>
+  </div>
+  
   <script>
-    function buttonClicked() {
-      fetch('/button').then(res => {
-        if (res.ok) alert("ESP32 received the click!");
-      });
-    }
+ 	 document.querySelectorAll('.circle-button').forEach(button => {
+    	button.addEventListener('click', () => {
+   	   // Remove "active" class from all buttons
+    	  document.querySelectorAll('.circle-button').forEach(btn => btn.classList.remove('active'));
+
+    	  // Add "active" to the clicked one
+     	 button.classList.add('active');
+    	});
+ 	 });
+    function submit(buttonId) {
+    	fetch('/submit?id=' + buttonId)
+     	 .then(res => res.text())
+    	 .then(data => {
+      	  if (buttonId === 1) {
+       	  	document.getElementById('input1').value = data;
+     	  } else if (buttonId === 2) {
+      	  	document.getElementById('input2').value = data;
+          }
+     	});
+  	}
+    function buttonClicked(buttonId) {
+    	fetch('/button?id=' + buttonId)
+     	 .then(res => res.text())
+    	 .then(data => {
+      	  if (buttonId === 1) {
+       	  	document.getElementById('input1').value = data;
+     	  } else if (buttonId === 2) {
+      	  	document.getElementById('input2').value = data;
+          }
+     	});
+  	}
   </script>
+
 </body>
 </html>
 )rawliteral";
@@ -40,9 +226,14 @@ void handleRoot() {
   server.send(200, "text/html", html);
 }
 
-void handleButton() {
+void handleSubmit1() {
   Serial.println("Button clicked!");
-  server.send(200, "text/plain", "OK");
+  server.send(200, "text/plain", String(20));
+}
+
+void handleSubmit2() {
+  Serial.println("Button clicked!");
+  server.send(200, "text/plain", String(20));
 }
 
 void accessPointInit() {
@@ -56,7 +247,34 @@ void accessPointInit() {
   // Serial.println(WiFi.softAPIP());  // Should print: 192.168.10.1
 
   server.on("/", handleRoot);
-  server.on("/button", handleButton);
+  server.on("/submit", []() {
+    if (server.hasArg("id")) {
+      String id = server.arg("id");
+      if (id == "1") {
+        server.send(200, "text/plain", String(21));
+      } else if (id == "2") {
+        server.send(200, "text/plain", String(22));
+      } else {
+        server.send(400, "text/plain", "Invalid ID");
+      }
+    } else {
+      server.send(400, "text/plain", "Missing id");
+    }
+  });
+  server.on("/button", []() {
+    if (server.hasArg("id")) {
+      String id = server.arg("id");
+      if (id == "1") {
+        // server.send(200, "text/plain", String(counter1));
+      } else if (id == "2") {
+        // server.send(200, "text/plain", String(counter2));
+      } else {
+        server.send(400, "text/plain", "Invalid ID");
+      }
+    } else {
+      server.send(400, "text/plain", "Missing id");
+    }
+  });
   server.begin();
   rgbLedWrite(RGB_BUILTIN, 0, 0, RGB_BRIGHTNESS);
 }
