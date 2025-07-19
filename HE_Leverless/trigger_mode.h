@@ -15,5 +15,8 @@ extern uint8_t* buttonState;
 void printRT_Triggers();
 void printRT_ResetDistances();
 void fillArrayWith(uint16_t* arr, uint16_t value, int size);
+void load_lastPos();
+bool save_RT_Data();
+void load_RT_data();
 
 #endif  /* TRIGGER_MODE_H_ */

@@ -2,6 +2,7 @@
 #include "esp32-hal.h"
 #include "esp32-hal-rgb-led.h"
 #include <Arduino.h>
+#include <EEPROM.h>
 #include "config.h"
 #include "calibration.h"
 #include "usb_helper.h"
@@ -89,13 +90,12 @@ int range_Calc(uint8_t* pins) {
   return max - min;
 }
 
-//TO-DO need to define base addresses for EEPROM storages
-void save_calib_Data() {
+bool save_calib_Data() {
   for (uint8_t i = 0; i < pincount; i++) {
     EEPROM.writeUShort(LP_BASE_ADDRESS + (2 * i), lowestPoints[i]);
     EEPROM.writeUShort(HP_BASE_ADDRESS + (2 * i), highestPoints[i]);
   }
-  EEPROM.commit();
+  return EEPROM.commit();
 }
 
 void load_calib_data() {

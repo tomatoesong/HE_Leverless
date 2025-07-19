@@ -3,6 +3,7 @@
 #include "calibration.h"
 #include "trigger_mode.h"
 #include "access_point.h"
+#include <EEPROM.h>
 
 bool calibrationMode = false;
 bool accessPointMode = false;
@@ -25,12 +26,15 @@ void setup() {
   //  EEPROM Setup begin
   EEPROM.begin(ADC_BYTE_SIZE * (pincount * 4 + 10));  // triggerDown and triggerUp plus 10 extra
   load_calib_data();
+  load_lastPos();
+  load_RT_data();
+
   //  USB Setup begin
   init_hid();
 
-  fillArrayWith(rT_Triggers, DEFAULT_TRIGGER, pincount);      //REMOVE THIS LATER!!!
-  fillArrayWith(rT_ResetDistances, DEFAULT_RESET, pincount);  //REMOVE THIS LATER!!!
-  fillArrayWith(lastPos, 1900, pincount);                     //REMOVE THIS LATER!!!
+  // fillArrayWith(rT_Triggers, DEFAULT_TRIGGER, pincount);      //REMOVE THIS LATER!!!
+  // fillArrayWith(rT_ResetDistances, DEFAULT_RESET, pincount);  //REMOVE THIS LATER!!!
+  // fillArrayWith(lastPos, 1900, pincount);                     //REMOVE THIS LATER!!!
 }
 
 void loop() {

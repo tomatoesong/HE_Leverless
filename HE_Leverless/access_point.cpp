@@ -1,9 +1,15 @@
+#include <cstddef>
 #include <WiFi.h>
 #include <WebServer.h>
 #include "config.h"
+#include "trigger_mode.h"
+#include "usb_helper.h"
+#include "calibration.h"
 
 const char* ssid = "HE_Leverless-AP";
 const char* password = "streetfighter6";
+
+uint8_t currentButtonIndex = 0;
 
 // Static IP configuration for Access Point
 IPAddress local_ip(192, 168, 10, 1);  // ESP32 AP IP
@@ -164,44 +170,46 @@ const char html[] PROGMEM = R"rawliteral(
 
     <button onclick="buttonClicked(13)" class="circle-button" style="top: 27%; left: 88%;">13</button>
   </div>
-
-  <div class="buttons">
-    <button>Calibrate</button>
-    <button>Button 2</button>
-  </div>
   
   <div class="input-area">
     <div class="input-with-button">
     <label>Trigger Distance:</label>
     <input id="input1" type="text" value="0" placeholder="First input..." />
-    <button onclick="submit(1)">Submit 1</button>
+    <button disabled onclick="submit(1)">-</button>
+    <button disabled onclick="submit(2)">+</button>
   	</div>
 
-  	<div class="input-with-button">
+  <div class="input-with-button">
     <label>Reset Distance:</label>
     <input id="input2" type="text" value="0" placeholder="Second input..." />
-    <button onclick="submit(2)">Submit 2</button>
+    <button disabled onclick="submit(3)">-</button>
+    <button disabled onclick="submit(4)">+</button>
   	</div>
+  </div>
+
+  <div class="buttons">
+    <button>Calibrate</button>
+    <button onclick="saveUserSettings()">Save</button>
   </div>
   
   <script>
  	 document.querySelectorAll('.circle-button').forEach(button => {
-    	button.addEventListener('click', () => {
-   	   // Remove "active" class from all buttons
-    	  document.querySelectorAll('.circle-button').forEach(btn => btn.classList.remove('active'));
-
-    	  // Add "active" to the clicked one
-     	 button.classList.add('active');
+     	button.addEventListener('click', () => {
+        	// Remove "active" class from all buttons
+        	document.querySelectorAll('.circle-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.input-area input, .input-area button').forEach(el => el.disabled = false);
+    	  	// Add "active" to the clicked one
+     	 	button.classList.add('active');
     	});
  	 });
     function submit(buttonId) {
     	fetch('/submit?id=' + buttonId)
      	 .then(res => res.text())
     	 .then(data => {
-      	  if (buttonId === 1) {
+      	  if (buttonId === 1 || buttonId === 2) {
        	  	document.getElementById('input1').value = data;
-     	  } else if (buttonId === 2) {
-      	  	document.getElementById('input2').value = data;
+     	    } else if (buttonId === 3 || buttonId === 4) {
+            document.getElementById('input2').value = data;     	  	
           }
      	});
   	}
@@ -209,13 +217,23 @@ const char html[] PROGMEM = R"rawliteral(
     	fetch('/button?id=' + buttonId)
      	 .then(res => res.text())
     	 .then(data => {
-      	  if (buttonId === 1) {
-       	  	document.getElementById('input1').value = data;
-     	  } else if (buttonId === 2) {
-      	  	document.getElementById('input2').value = data;
-          }
+          const values = data.split(",");
+       	  document.getElementById('input1').value = values[0];
+          document.getElementById('input2').value = values[1];
      	});
   	}
+
+    function saveUserSettings() {
+      fetch('/save')
+      .then(res => res.text())
+      .then(data => {
+        alert("Saving " + data);
+      });
+    }
+    
+    window.addEventListener('DOMContentLoaded', () => {
+    	document.querySelectorAll('.input-area input, .input-area button').forEach(el => el.disabled = true);
+    });
   </script>
 
 </body>
@@ -224,16 +242,6 @@ const char html[] PROGMEM = R"rawliteral(
 
 void handleRoot() {
   server.send(200, "text/html", html);
-}
-
-void handleSubmit1() {
-  Serial.println("Button clicked!");
-  server.send(200, "text/plain", String(20));
-}
-
-void handleSubmit2() {
-  Serial.println("Button clicked!");
-  server.send(200, "text/plain", String(20));
 }
 
 void accessPointInit() {
@@ -247,13 +255,32 @@ void accessPointInit() {
   // Serial.println(WiFi.softAPIP());  // Should print: 192.168.10.1
 
   server.on("/", handleRoot);
+  server.on("/save", []() {
+    if (save_RT_Data()) {
+      server.send(200, "text/plain", "Successful");
+    }else{
+      server.send(200, "text/plain", "Failed");
+    }
+  });
   server.on("/submit", []() {
     if (server.hasArg("id")) {
       String id = server.arg("id");
-      if (id == "1") {
-        server.send(200, "text/plain", String(21));
-      } else if (id == "2") {
-        server.send(200, "text/plain", String(22));
+      if (id == "1") {  // Trigger Distance DOWN
+        rT_Triggers[currentButtonIndex]--;
+        if (rT_Triggers[currentButtonIndex] < 1) rT_Triggers[currentButtonIndex] = 1;
+        server.send(200, "text/plain", String(rT_Triggers[currentButtonIndex]));
+      } else if (id == "2") {  // Trigger Distance UP
+        rT_Triggers[currentButtonIndex]++;
+        if (rT_Triggers[currentButtonIndex] > (highestPoints[currentButtonIndex] - lowestPoints[currentButtonIndex])) rT_Triggers[currentButtonIndex] = highestPoints[currentButtonIndex] - lowestPoints[currentButtonIndex];
+        server.send(200, "text/plain", String(rT_Triggers[currentButtonIndex]));
+      } else if (id == "3") {  // Reset Distance Down
+        rT_ResetDistances[currentButtonIndex]--;
+        if (rT_ResetDistances[currentButtonIndex] < 1) rT_ResetDistances[currentButtonIndex] = 1;
+        server.send(200, "text/plain", String(rT_ResetDistances[currentButtonIndex]));
+      } else if (id == "4") {  // Reset Distance UP
+        rT_ResetDistances[currentButtonIndex]++;
+        if (rT_ResetDistances[currentButtonIndex] > (highestPoints[currentButtonIndex] - lowestPoints[currentButtonIndex])) rT_ResetDistances[currentButtonIndex] = highestPoints[currentButtonIndex] - lowestPoints[currentButtonIndex];
+        server.send(200, "text/plain", String(rT_ResetDistances[currentButtonIndex]));
       } else {
         server.send(400, "text/plain", "Invalid ID");
       }
@@ -264,12 +291,12 @@ void accessPointInit() {
   server.on("/button", []() {
     if (server.hasArg("id")) {
       String id = server.arg("id");
-      if (id == "1") {
-        // server.send(200, "text/plain", String(counter1));
-      } else if (id == "2") {
-        // server.send(200, "text/plain", String(counter2));
+      int index = id.toInt();
+      if (index > 0 && index <= pincount) {
+        currentButtonIndex = index - 1;
+        server.send(200, "text/plain", String(rT_Triggers[currentButtonIndex]) + "," + String(rT_ResetDistances[currentButtonIndex]));
       } else {
-        server.send(400, "text/plain", "Invalid ID");
+        server.send(200, "text/plain", "ID out of bounds!");
       }
     } else {
       server.send(400, "text/plain", "Missing id");
