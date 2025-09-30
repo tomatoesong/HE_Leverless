@@ -17,6 +17,36 @@ A custom-built **fighting game controller** featuring **Hall effect sensors** fo
 
 ---
 
+## Custom PCB Layout  
+
+| Front View |
+|------------|
+| ![PCB Layout](images/PCB_1.png) |
+
+Created Using KiCad and custom library and footprints!
+
+### ✅ PCB Features
+- Digital and Analog ground plane seperation
+- Low count BOM
+- One sided for easy of assembly on hot plate or oven!
+
+---
+
+## Web-Based UI 
+
+| Startup View | Selection | Save with Ease |
+|------------|------------|------------|
+| ![PCB Layout](images/WEB_UI_1.png) | ![PCB Layout](images/WEB_UI_2.png) | ![PCB Layout](images/WEB_UI_3.png) |
+
+Fully integrated and interactable WEB UI from an embedded board
+
+### ✅ PCB Features
+- Digital and Analog ground plane seperation
+- Low count BOM
+- One sided for easy of assembly on hot plate or oven!
+
+---
+
 ## CAD Model  
 <!--
 | Front View | Inside View | 
@@ -34,21 +64,6 @@ A custom-built **fighting game controller** featuring **Hall effect sensors** fo
 | ![WireFrame View](images/CAD_MODEL_2.png) |
 
 Designed in Fusion360 with all components modeled for accuracy. 
-
----
-
-## Custom PCB Layout  
-
-| Front View |
-|------------|
-| ![PCB Layout](images/PCB_1.png) |
-
-Created Using KiCad and custom library and footprints!
-
-### ✅ PCB Features
-- Digital and Analog ground plane seperation
-- Low count BOM
-- One sided for easy of assembly on hot plate or oven!
 
 ---
 
