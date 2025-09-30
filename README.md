@@ -10,7 +10,7 @@ A custom-built **fighting game controller** featuring **Hall effect sensors** fo
 
 | Front View | Inside View | 
 |------------|-------------|
-| ![Front View](images/front.jpg) | ![WireFrame View](images/inside.jpg) |
+| ![Front View](images/CAD_MODEL_1.png) | ![WireFrame View](images/CAD_MODEL_2.png) |
 
 *(Replace the image paths with your actual files, e.g., `/assets/controller-front.png`)*  
 
