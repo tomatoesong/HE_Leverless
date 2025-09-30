@@ -34,7 +34,7 @@ Designed in Fusion360 with all components modeled for accuracy.
 
 Created Using KiCad and custom library and footprints!
 
-### ✅ Key Features
+### ✅ PCB Features
 - Digital and Analog ground plane seperation
 - Low count BOM
 - One sided for easy of assembly on hot plate or oven!
@@ -45,7 +45,7 @@ Created Using KiCad and custom library and footprints!
 
 - 🕹 **Hall Effect Sensors** – no wear and tear from metal contact based switches 
 - 🔧 **Modular Design** – easily replace buttons, just pull out an switch and snap in a new one
-- ⚡ **Low Latency** – optimized input response with fully customizable actuation points for every switch!  
+- ⚡ **Low Latency** – optimized input response at over 2000Hz polling with fully customizable actuation points for every switch!  
 - 💻 **Open Source Firmware** – customizable and community-driven  
 - 🎨 **Custom Build** – unique layout and aesthetics  
 
