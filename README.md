@@ -8,8 +8,8 @@ A custom-built **fighting game controller** featuring **Hall effect sensors** fo
 
 ## 📸 CAD Model  
 
-| Front View | Inside View | Close-up of Hall Effect Sensor |
-|------------|-------------|--------------------------------|
+| Front View | Inside View | 
+|------------|-------------|
 | ![Front View](images/front.jpg) | ![WireFrame View](images/inside.jpg) |
 
 *(Replace the image paths with your actual files, e.g., `/assets/controller-front.png`)*  
