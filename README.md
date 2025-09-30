@@ -2,7 +2,7 @@
 
 # 🎮 Hall Effect Fighting Game Controller  
 
-A custom-built **fighting game controller** featuring **Hall effect sensors** for ultra-durable, low latency performance. Designed for competitive play, modularity, and long-term reliability.  
+A custom-built **fighting game controller** featuring **Hall effect sensors** based on ESP32-S3 for ultra-durable, low latency performance. Designed for competitive play, modularity, and long-term reliability.  
 
 ---
 
@@ -40,9 +40,9 @@ Created Using KiCad and custom library and footprints!
 
 Fully integrated and interactable WEB UI from an embedded board
 
-### ✅ PCB Features
+### ✅ WEB-UI Features
 - Digital and Analog ground plane seperation
-- Low count BOM
+- Low count BOM 192.168.10.1
 - One sided for easy of assembly on hot plate or oven!
 
 ---
