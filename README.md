@@ -44,6 +44,7 @@ Fully integrated and interactable WEB UI from an embedded board
 - Hosts it's own Wifi you connect to
 - Access the configurator from any browser at 192.168.10.1
 - Individually switch values can be set with intuitive UI indicating what button you are adjusting
+- 5 MICRON steps of adjustment for HIGH precision customization
 
 ---
 
