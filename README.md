@@ -41,9 +41,9 @@ Created Using KiCad and custom library and footprints!
 Fully integrated and interactable WEB UI from an embedded board
 
 ### ✅ WEB-UI Features
-- Digital and Analog ground plane seperation
-- Low count BOM 192.168.10.1
-- One sided for easy of assembly on hot plate or oven!
+- Hosts it's own Wifi you connect to
+- Access the configurator from any browser at 192.168.10.1
+- Individually switch values can be set with intuitive UI indicating what button you are adjusting
 
 ---
 
