@@ -18,9 +18,6 @@ IPAddress subnet(255, 255, 255, 0);   // Standard subnet mask
 
 WebServer server(80);
 
-//define authenication
-const char* base64Encoding = "c29uZ3RvbTk2Ojk2MDEwNQ==";  // base64encoding user:pass // songtom96:960105
-
 const char html[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="en">
